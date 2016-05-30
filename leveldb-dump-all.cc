@@ -44,101 +44,94 @@
 #include <hyperleveldb/filter_policy.h>
 
 void
-decode(const char* data, size_t data_sz, std::vector<char>* out)
+decode(const char *data, size_t data_sz, std::vector<char> *out)
 {
-    out->resize(data_sz * 4 + 1);
-    char* ptr = &out->front();
-
-    for (size_t i = 0; i < data_sz; ++i)
-    {
-        if (isalnum(data[i]) ||
-            (ispunct(data[i]) && data[i] != '\'') ||
-            data[i] == ' ')
-        {
-            *ptr = data[i];
-            ++ptr;
-        }
-        else if (data[i] == '\n')
-        {
-            *ptr = '\\';
-            ++ptr;
-            *ptr = 'n';
-            ++ptr;
-        }
-        else if (data[i] == '\r')
-        {
-            *ptr = '\\';
-            ++ptr;
-            *ptr = 'r';
-            ++ptr;
-        }
-        else if (data[i] == '\t')
-        {
-            *ptr = '\\';
-            ++ptr;
-            *ptr = 't';
-            ++ptr;
-        }
-        else if (data[i] == '\'')
-        {
-            *ptr = '\\';
-            ++ptr;
-            *ptr = '\'';
-            ++ptr;
-        }
-        else
-        {
-            *ptr = '\\';
-            ++ptr;
-            *ptr = 'x';
-            ++ptr;
-            sprintf(ptr, "%02x", data[i] & 0xff);
-            ptr += 2;
-        }
-    }
+	out->resize(data_sz * 4 + 1);
+	char *ptr = &out->front();
+	for (size_t i = 0; i < data_sz; ++i)
+	{
+		if (isalnum(data[i]) ||
+		    (ispunct(data[i]) && data[i] != '\'') ||
+		    data[i] == ' ')
+		{
+			*ptr = data[i];
+			++ptr;
+		}
+		else if (data[i] == '\n')
+		{
+			*ptr = '\\';
+			++ptr;
+			*ptr = 'n';
+			++ptr;
+		}
+		else if (data[i] == '\r')
+		{
+			*ptr = '\\';
+			++ptr;
+			*ptr = 'r';
+			++ptr;
+		}
+		else if (data[i] == '\t')
+		{
+			*ptr = '\\';
+			++ptr;
+			*ptr = 't';
+			++ptr;
+		}
+		else if (data[i] == '\'')
+		{
+			*ptr = '\\';
+			++ptr;
+			*ptr = '\'';
+			++ptr;
+		}
+		else
+		{
+			*ptr = '\\';
+			++ptr;
+			*ptr = 'x';
+			++ptr;
+			sprintf(ptr, "%02x", data[i] & 0xff);
+			ptr += 2;
+		}
+	}
 }
 
 int
-main(int argc, const char* argv[])
+main(int argc, const char *argv[])
 {
-    for (int i = 1; i < argc; ++i)
-    {
-        std::cout << "dumping db at " << argv[i] << std::endl;
-        leveldb::Options oopts;
-        oopts.create_if_missing = false;
-        oopts.filter_policy = leveldb::NewBloomFilterPolicy(10);
-        std::string name(argv[i]);
-        leveldb::DB* db;
-        leveldb::Status st = leveldb::DB::Open(oopts, name, &db);
-
-        if (!st.ok())
-        {
-            std::cout << "could not open LevelDB: " << st.ToString() << std::endl;
-            continue;
-        }
-
-        std::auto_ptr<leveldb::Iterator> it(db->NewIterator(leveldb::ReadOptions()));
-        it->SeekToFirst();
-
-        while (it->Valid())
-        {
-            std::vector<char> k;
-            std::vector<char> v;
-            decode(it->key().data(), it->key().size(), &k);
-            decode(it->value().data(), it->value().size(), &v);
-            std::cout << "\"" << &k[0] << "\" -> \"" << &v[0] << "\"\n";
-            it->Next();
-
-            if (!it->status().ok())
-            {
-                std::cerr << "error: " << it->status().ToString() << std::endl;
-            }
-        }
-
-        std::cout << std::flush;
-        it.reset();
-        delete db;
-    }
-
-    return EXIT_SUCCESS;
+	for (int i = 1; i < argc; ++i)
+	{
+		std::cout << "dumping db at " << argv[i] << std::endl;
+		leveldb::Options oopts;
+		oopts.create_if_missing = false;
+		oopts.filter_policy = leveldb::NewBloomFilterPolicy(10);
+		std::string name(argv[i]);
+		leveldb::DB *db;
+		leveldb::Status st = leveldb::DB::Open(oopts, name, &db);
+		if (!st.ok())
+		{
+			std::cout << "could not open LevelDB: " << st.ToString() << std::endl;
+			continue;
+		}
+		std::auto_ptr<leveldb::Iterator> it(db->NewIterator(leveldb::ReadOptions()));
+		it->SeekToFirst();
+		while (it->Valid())
+		{
+			std::vector<char> k;
+			std::vector<char> v;
+			decode(it->key().data(), it->key().size(), &k);
+			decode(it->value().data(), it->value().size(), &v);
+			std::cout << "\"" << &k[0] << "\" -> \"" << &v[0] << "\"\n";
+			it->Next();
+			if (!it->status().ok())
+			{
+				std::cerr << "error: " << it->status().ToString() << std::endl;
+			}
+		}
+		std::cout << std::flush;
+		it.reset();
+		delete db;
+	}
+	return EXIT_SUCCESS;
 }

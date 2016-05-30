@@ -5,7 +5,8 @@
 #ifndef STORAGE_LEVELDB_TABLE_MERGER_H_
 #define STORAGE_LEVELDB_TABLE_MERGER_H_
 
-namespace leveldb {
+namespace leveldb
+{
 
 class Comparator;
 class Iterator;
@@ -18,8 +19,8 @@ class Iterator;
 // key is present in K child iterators, it will be yielded K times.
 //
 // REQUIRES: n >= 0
-extern Iterator* NewMergingIterator(
-    const Comparator* comparator, Iterator** children, int n);
+extern Iterator *NewMergingIterator(
+    const Comparator *comparator, Iterator **children, int n);
 
 }  // namespace leveldb
 

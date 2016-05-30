@@ -12,40 +12,42 @@
 #include "util/atomic.h"
 #include "util/mutexlock.h"
 
-namespace leveldb {
+namespace leveldb
+{
 
-class Arena {
- public:
-  Arena();
-  ~Arena() throw ();
+class Arena
+{
+public:
+	Arena();
+	~Arena() throw ();
 
-  // Return a pointer to a newly allocated memory block of "bytes" bytes.
-  char* Allocate(size_t bytes);
+	// Return a pointer to a newly allocated memory block of "bytes" bytes.
+	char *Allocate(size_t bytes);
 
-  // Allocate memory with the normal alignment guarantees provided by malloc
-  char* AllocateAligned(size_t bytes);
+	// Allocate memory with the normal alignment guarantees provided by malloc
+	char *AllocateAligned(size_t bytes);
 
-  // Returns an estimate of the total memory usage of data allocated
-  // by the arena (including space allocated but not yet used for user
-  // allocations).
-  uint64_t MemoryUsage() { return atomic::load_64_nobarrier(&memory_usage_); }
+	// Returns an estimate of the total memory usage of data allocated
+	// by the arena (including space allocated but not yet used for user
+	// allocations).
+	uint64_t MemoryUsage() { return atomic::load_64_nobarrier(&memory_usage_); }
 
- private:
-  struct Block;
+private:
+	struct Block;
 
-  Block* NewBlock(size_t bytes);
-  char* AllocateLarge(size_t bytes);
-  char* AllocateFinalize(Block* b, size_t bytes);
+	Block *NewBlock(size_t bytes);
+	char *AllocateLarge(size_t bytes);
+	char *AllocateFinalize(Block *b, size_t bytes);
 
-  const size_t align_;
-  const size_t page_size_;
-  uint64_t memory_usage_;
-  Block* blocks_;
-  Block* large_;
+	const size_t align_;
+	const size_t page_size_;
+	uint64_t memory_usage_;
+	Block *blocks_;
+	Block *large_;
 
-  // No copying allowed
-  Arena(const Arena&);
-  void operator=(const Arena&);
+	// No copying allowed
+	Arena(const Arena &);
+	void operator=(const Arena &);
 };
 
 }  // namespace leveldb

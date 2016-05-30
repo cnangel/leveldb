@@ -28,8 +28,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.62])
-AC_INIT([hyperleveldb], [1.0.dev], [robert@hyperdex.org])
+AC_PREREQ([2.59])
+AC_INIT([hyperleveldb], [1.2.2], [robert@hyperdex.org])
 m4_define([serial_tests], [
     m4_esyscmd([case `automake --version | head -n 1` in
                 *1.11*);;
